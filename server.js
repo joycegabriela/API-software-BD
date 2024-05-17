@@ -1,6 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const QueryString = require('qs');
+const mysql = require('mysql');
+
+const conn = mysql.createConnection({
+host: 'localhost',
+user: 'joyce',
+password: '',
+database: 'software_api'
+});
+
+conn.query((erro, resultado) => {
+
+})
+
 
 
 const app = express();
@@ -10,106 +22,86 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.get('/', (req, res) => {
-    res.send('Hello World');
-});
+app.use(express.urlencoded({
+    extended: true
+}));
 
-app.listen(3000);
 
-console.log('Servidor iniciado na porta 3000');
-
-let arrSoftware = [
-    {
-        id: 1,
-        nome: 'QuickBook',
-        empresa: 'Finance Tech IncomingMessage',
-        versao: 5.0,
-        forma_cobranca: 'Assinatura Mensal',
-        valor: 49.99,
-        data_criacao: '15/03/2017',
-        data_atualizacao: '28/04/2024',
-    },
-    {
-        id: 2,
-        nome: 'PixelPro',
-        empresa: 'DesignWorks Ltda',
-        versao: 3.5,
-        forma_cobranca: 'Licença Perpétua',
-        valor: 299.99,
-        data_criacao: '20/08/2018',
-        data_atualizacao: '05/05/2024',
-    },
-    {
-        id: 3,
-        nome: 'SecureNet',
-        empresa: 'CyberGuard Inc',
-        versao: 2.0,
-        forma_cobranca: 'Assinatura Anual',
-        valor: 699.99,
-        data_criacao: '10/11/2019',
-        data_atualizacao: '15/04/2024',
-    },
-    {
-        id: 4,
-        nome: 'DataSense',
-        empresa: 'InfoTech Solutions',
-        versao: 4.0,
-        forma_cobranca: 'Licença Perpétua',
-        valor: 599.99,
-        data_criacao: '05/05/2016',
-        data_atualizacao: '20/03/2024',
-    },
-    {
-        id: 5,
-        nome: 'MediaMaster',
-        empresa: 'MediaWorks Inc',
-        versao: 2.2,
-        forma_cobranca: 'Assinatura Trimestal',
-        valor: 599.99,
-        data_criacao: '03/09/2017',
-        data_atualizacao: '10/04/2024',
-    },
-
-];
-
+// Consultar todo os software
 app.get('/software',(req,res)=> {
-    console.log(arrSoftware);
-    res.send(arrSoftware);
-})
+   
+    conn.query('select * from software',(erro, resultado) => {
+        try {
+            const sof = resultado.map(sof=> ({ 
+                id: sof.id,
+                nome: sof.nome,
+                empresa: sof.empresa,
+                versao: sof.versao,
+                forma_cobranca: sof.forma_cobranca,
+                valor: sof.valor,
+                data_criacao: sof.data_criacao,
+                data_atualizacao: sof.data_atualizacao,
+            }));
+            res.json(sof);
+            console.log(sof);
+        } catch (erro) {
+            res.send('Não existe nenhum software cadastrado!!');
+            console.error('Não existe nenhum software cadastrado!!', erro);
+        }{}
+    });
+    
+});
 
 //Consultar cada software pelo o id
 app.get('/software/:id', (req,res)=>{
     const sofId = req.params.id;
-    const sof = arrSoftware.find(sof => sof.id === parseInt(sofId));
     if(sof){
         console.log(sof);
         res.send(sof);
     }else{
         res.send('Não existe software com esse ID')
     }
+    conn.query((erro, resultado) => {
+    
+    });
 });
 
 //Deletando pelo o id
-app.delete('/software/delete/:id', (req,res) => {
+app.delete('/software/deletar/:id', (req,res) => {
     const sofId = req.params.id;
-    arrSoftware = arrSoftware.filter(sof => sof.id !== parseInt(sofId));
 res.send(`Software ${sofId} excluído com sucesso`);
-
-console.log(arrSoftware);
+conn.query((erro, resultado) => {
+    
+});
 });
 
 //Criando um novo Software 
 app.post('/software/criar', (req,res)=> {
     try{
         const sof = req.body;
-        arrSoftware.push(sof);
-        res.send('Software adicionado com sucesso!')
-        res.send(sof);
+        res.send(`Software ${sof.id} criado com sucesso!`)
         console.log(id)
         console.log(body)
     }catch (error){
         res.status(400).send('Erro ao processar a requisição!!!', error.message)
     }
+    conn.query((erro, resultado) => {
+    
+    });
+});
+
+//Editando o Software pelo o id
+app.put('/software/editar/:id', (req,res) => {
+    const sofId = req.params.id;
+    const sof = req.body;
+res.send(`Software ${sofId} editado com sucesso!`);
+    console.log(sofId);
+    conn.query((erro, resultado) => {
+    
+    });
 });
 
 
+app.listen(3000);
+
+console.log('Servidor iniciado na porta 3000');
