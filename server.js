@@ -3,10 +3,10 @@ const cors = require('cors');
 const mysql = require('mysql');
 
 const conn = mysql.createConnection({
-host: 'localhost',
-user: 'joyce',
-password: '',
-database: 'software_api'
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'software_api'
 });
 
 conn.query((erro, resultado) => {
@@ -28,11 +28,11 @@ app.use(express.urlencoded({
 
 
 // Consultar todo os software
-app.get('/software',(req,res)=> {
-   
-    conn.query('select * from software',(erro, resultado) => {
+app.get('/software', (req, res) => {
+
+    conn.query('select * from software', (erro, resultado) => {
         try {
-            const sof = resultado.map(sof=> ({ 
+            const sof = resultado.map(sof => ({
                 id: sof.id,
                 nome: sof.nome,
                 empresa: sof.empresa,
@@ -47,57 +47,101 @@ app.get('/software',(req,res)=> {
         } catch (erro) {
             res.send('Não existe nenhum software cadastrado!!');
             console.error('Não existe nenhum software cadastrado!!', erro);
-        }{}
+        }
     });
-    
+
 });
 
 //Consultar cada software pelo o id
-app.get('/software/:id', (req,res)=>{
+app.get('/software/:id', (req, res) => {
     const sofId = req.params.id;
-    if(sof){
-        console.log(sof);
-        res.send(sof);
-    }else{
-        res.send('Não existe software com esse ID')
-    }
-    conn.query((erro, resultado) => {
-    
+    conn.query(`select * from software where id = ${sofId}`, (erro, resultado) => {
+        try {
+            const sof = resultado.map(sof => ({
+                id: sof.id,
+                nome: sof.nome,
+                empresa: sof.empresa,
+                versao: sof.versao,
+                forma_cobranca: sof.forma_cobranca,
+                valor: sof.valor,
+                data_criacao: sof.data_criacao,
+                data_atualizacao: sof.data_atualizacao,
+            }));
+            res.json(sof);
+            console.log(sof);
+        } catch (erro) {
+            res.send('Não existe software com esse ID');
+            console.error('Não existe software com esse ID', erro);
+        }
     });
 });
 
 //Deletando pelo o id
-app.delete('/software/deletar/:id', (req,res) => {
+app.delete('/software/deletar/:id', (req, res) => {
     const sofId = req.params.id;
-res.send(`Software ${sofId} excluído com sucesso`);
-conn.query((erro, resultado) => {
-    
-});
+    res.send(`Software ${sofId} excluído com sucesso`);
+    conn.query(`delete from software where id = ${sofId}`, (erro, resultado) => {
+        try {
+            const sof = resultado.map(sof => ({
+                id: sof.id,
+                nome: sof.nome,
+                empresa: sof.empresa,
+                versao: sof.versao,
+                forma_cobranca: sof.forma_cobranca,
+                valor: sof.valor,
+                data_criacao: sof.data_criacao,
+                data_atualizacao: sof.data_atualizacao,
+            }));
+            res.json(sof);
+            console.log(sof);
+        } catch (erro) {
+            res.send('Não existe software com esse ID');
+            console.error('Não existe software com esse ID', erro);
+        }
+    })
 });
 
 //Criando um novo Software 
-app.post('/software/criar', (req,res)=> {
-    try{
-        const sof = req.body;
-        res.send(`Software ${sof.id} criado com sucesso!`)
-        console.log(id)
-        console.log(body)
-    }catch (error){
-        res.status(400).send('Erro ao processar a requisição!!!', error.message)
-    }
-    conn.query((erro, resultado) => {
-    
+app.post('/software/criar', (req, res) => {
+    const {id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao } = req.body;
+    console.log(req.body)
+    try {
+            conn.query(`insert into software (id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao) values (${Number(id)}, ${nome}, ${empresa}, ${versao}, ${forma_cobranca}, ${Number(valor)}, ${data_criacao}, ${data_atualizacao})`, (erro, resultado) => {
+                res.send('Software cadastrado com sucesso!!');
+                if (erro){
+                    console.error(erro)
+                }
+            });
+
+        } catch (erro) {
+            res.send('Erro ao criar software');
+            console.error('Erro ao criar software', erro);
+        }
     });
-});
+
 
 //Editando o Software pelo o id
-app.put('/software/editar/:id', (req,res) => {
+app.put('/software/editar/:id', (req, res) => {
     const sofId = req.params.id;
     const sof = req.body;
-res.send(`Software ${sofId} editado com sucesso!`);
-    console.log(sofId);
-    conn.query((erro, resultado) => {
-    
+    conn.query(`update software set id = ${sofId} where id = ${sof}`, (erro, resultado) => {
+        try {
+            const sof = resultado.map(sof => ({
+                id: sof.id,
+                nome: sof.nome,
+                empresa: sof.empresa,
+                versao: sof.versao,
+                forma_cobranca: sof.forma_cobranca,
+                valor: sof.valor,
+                data_criacao: sof.data_criacao,
+                data_atualizacao: sof.data_atualizacao,
+            }));
+            res.json(sof);
+            console.log(sof);
+        } catch (erro) {
+            res.send('Não existe software com esse ID');
+            console.error('Não existe software com esse ID', erro);
+        }
     });
 });
 
