@@ -81,23 +81,9 @@ app.delete('/software/deletar/:id', (req, res) => {
     const sofId = req.params.id;
     res.send(`Software ${sofId} excluído com sucesso`);
     conn.query(`delete from software where id = ${sofId}`, (erro, resultado) => {
-        try {
-            const sof = resultado.map(sof => ({
-                id: sof.id,
-                nome: sof.nome,
-                empresa: sof.empresa,
-                versao: sof.versao,
-                forma_cobranca: sof.forma_cobranca,
-                valor: sof.valor,
-                data_criacao: sof.data_criacao,
-                data_atualizacao: sof.data_atualizacao,
-            }));
-            res.json(sof);
-            console.log(sof);
-        } catch (erro) {
-            res.send('Não existe software com esse ID');
-            console.error('Não existe software com esse ID', erro);
-        }
+    if(erro){
+        console.error(erro)
+    }
     })
 });
 
@@ -106,7 +92,7 @@ app.post('/software/criar', (req, res) => {
     const {id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao } = req.body;
     console.log(req.body)
     try {
-            conn.query(`insert into software (id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao) values (${Number(id)}, ${nome}, ${empresa}, ${versao}, ${forma_cobranca}, ${Number(valor)}, ${data_criacao}, ${data_atualizacao})`, (erro, resultado) => {
+            conn.query(`insert into software (id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao) values ('${Number(id)}', '${nome}', '${empresa}', '${versao}', '${forma_cobranca}', '${Number(valor)}', '${data_criacao}', '${data_atualizacao}')`, (erro, resultado) => {
                 res.send('Software cadastrado com sucesso!!');
                 if (erro){
                     console.error(erro)
@@ -123,25 +109,12 @@ app.post('/software/criar', (req, res) => {
 //Editando o Software pelo o id
 app.put('/software/editar/:id', (req, res) => {
     const sofId = req.params.id;
-    const sof = req.body;
-    conn.query(`update software set id = ${sofId} where id = ${sof}`, (erro, resultado) => {
-        try {
-            const sof = resultado.map(sof => ({
-                id: sof.id,
-                nome: sof.nome,
-                empresa: sof.empresa,
-                versao: sof.versao,
-                forma_cobranca: sof.forma_cobranca,
-                valor: sof.valor,
-                data_criacao: sof.data_criacao,
-                data_atualizacao: sof.data_atualizacao,
-            }));
-            res.json(sof);
-            console.log(sof);
-        } catch (erro) {
-            res.send('Não existe software com esse ID');
-            console.error('Não existe software com esse ID', erro);
-        }
+    const {id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao } = req.body;
+    conn.query(`update software set id = ${Number(id)} where id ='${Number(sofId)}'`, (erro, resultado) => {
+        res.send(`Software ${sofId} editado com sucesso!!`);
+       if(erro){
+        console.error(erro)
+       }
     });
 });
 
