@@ -9,9 +9,6 @@ const conn = mysql.createConnection({
     database: 'software_api'
 });
 
-conn.query((erro, resultado) => {
-
-})
 
 
 
@@ -44,7 +41,7 @@ app.get('/software', (req, res) => {
             }));
             res.json(sof);
             console.log(sof);
-        } catch (erro) {
+        } catch  {
             res.send('Não existe nenhum software cadastrado!!');
             console.error('Não existe nenhum software cadastrado!!', erro);
         }
@@ -69,7 +66,7 @@ app.get('/software/:id', (req, res) => {
             }));
             res.json(sof);
             console.log(sof);
-        } catch (erro) {
+        } catch  {
             res.send('Não existe software com esse ID');
             console.error('Não existe software com esse ID', erro);
         }
@@ -89,10 +86,27 @@ app.delete('/software/deletar/:id', (req, res) => {
 
 //Criando um novo Software 
 app.post('/software/criar', (req, res) => {
-    const {id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao } = req.body;
+    const date = new Date();
+    const dia = date.getDate();
+    const mes = date.getMonth() + 1;
+    const ano = date.getFullYear();
+    let dataformatada = `0${dia}/0${mes}/${ano}`
+    console.log(dataformatada)
+
+    if (mes.toString().length == 1 && dia.toString().length == 1){
+        dataformatada = `0${dia}/0${mes}/${ano}`;
+       console.log(dataformatada)
+    } else if (dia.toString().length == 1){
+        dataformatada = `0${dia}/${mes}/${ano}`;
+       console.log(dataformatada)
+       }else if (mes.toString().length == 1){
+         dataformatada = `${dia}/0${mes}/${ano}`;
+        console.log(dataformatada)}
+        
+    const {id, nome, empresa, versao, forma_cobranca, valor } = req.body;
     console.log(req.body)
     try {
-            conn.query(`insert into software (id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao) values ('${Number(id)}', '${nome}', '${empresa}', '${versao}', '${forma_cobranca}', '${Number(valor)}', '${data_criacao}', '${data_atualizacao}')`, (erro, resultado) => {
+           conn.query(`insert into software (id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao) values ('${Number(id)}', '${nome}', '${empresa}', '${versao}', '${forma_cobranca}', 'R$${valor}', '${dataformatada}', '${dataformatada}')`, (erro, resultado) => {
                 res.send('Software cadastrado com sucesso!!');
                 if (erro){
                     console.error(erro)
@@ -109,15 +123,33 @@ app.post('/software/criar', (req, res) => {
 //Editando o Software pelo o id
 app.put('/software/editar/:id', (req, res) => {
     const sofId = req.params.id;
-    const {id, nome, empresa, versao, forma_cobranca, valor, data_criacao, data_atualizacao } = req.body;
-    conn.query(`update software set id = ${Number(id)} where id ='${Number(sofId)}'`, (erro, resultado) => {
+    const date = new Date();
+    const dia = date.getDate();
+    const mes = date.getMonth() + 1;
+    const ano = date.getFullYear();
+    let dataformatada = `0${dia}/0${mes}/${ano}`
+    console.log(dataformatada)
+    
+    if (mes.toString().length == 1 && dia.toString().length == 1){
+        dataformatada = `0${dia}/0${mes}/${ano}`;
+       console.log(dataformatada)
+    } else if (dia.toString().length == 1){
+        dataformatada = `0${dia}/${mes}/${ano}`;
+       console.log(dataformatada)
+       }else if (mes.toString().length == 1){
+         dataformatada = `${dia}/0${mes}/${ano}`;
+        console.log(dataformatada)}
+
+
+    const {nome, empresa, versao, forma_cobranca, valor} = req.body;
+    console.log('BODY -> ', req.body)
+    conn.query(`update software set nome = '${nome}', empresa = '${empresa}', versao = '${versao}', forma_cobranca = '${forma_cobranca}', valor = 'R$${valor}', data_atualizacao = '${dataformatada}' where id ='${Number(sofId)}'`, (erro, resultado) => {
         res.send(`Software ${sofId} editado com sucesso!!`);
        if(erro){
         console.error(erro)
        }
     });
 });
-
 
 app.listen(3000);
 
